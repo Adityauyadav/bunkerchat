@@ -8,7 +8,6 @@ type User struct {
 	ID           int
 	Username     string
 	PasswordHash string
-	Token        string
 	CreatedAt    time.Time
 }
 

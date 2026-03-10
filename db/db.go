@@ -31,8 +31,7 @@ func createTables() {
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		username TEXT UNIQUE NOT NULL,
 		password_hash TEXT NOT NULL,
-		token TEXT,
-		create_at DATETIME DEFAULT CURRENT_TIMESTAMP
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 	
 	);`
 
@@ -43,8 +42,8 @@ func createTables() {
 		sent_to_id INTEGER NOT NULL,
 		content TEXT NOT NULL,
 		read BOOLEAN DEFAULT FALSE,
-		create_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-		FOREIGN KEY (sent_from_id) REFERENCES users(id)
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		FOREIGN KEY (sent_from_id) REFERENCES users(id),
 		FOREIGN KEY (sent_to_id) REFERENCES users(id)
 	);`
 

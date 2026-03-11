@@ -19,3 +19,8 @@ type Message struct {
 	Read       bool
 	CreatedAt  time.Time
 }
+
+type MessagePacket struct {
+	To      string `json:"to"`
+	Content string `json:"content"`
+}

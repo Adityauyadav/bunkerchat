@@ -1,32 +1,36 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/adityauyadav/bunkerchat/db"
 	"github.com/joho/godotenv"
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found")
 	}
 
-	fmt.Println("BunkerChat server starting...")
 	db.Init()
 
-	http.HandleFunc("/health", healthHandler)
+	hub := NewHub()
 
-	log.Println("Server listening on port 8080")
-	err = http.ListenAndServe(":8080", nil)
-	if err != nil {
-		log.Fatal(err)
+	registerRoutes(hub)
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
 	}
+
+	log.Printf("Server starting on :%s", port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
-func healthHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "BunkerChat server is alive")
+func registerRoutes(hub *Hub) {
+	http.HandleFunc("/register", registerHandler)
+	http.HandleFunc("/login", loginHandler)
+	http.HandleFunc("/ws", wsHandler(hub))
 }

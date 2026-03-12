@@ -42,18 +42,19 @@ func GenerateToken(userID int, username string) (string, error) {
 
 }
 
-func ValidateToken(tokenString string) (int, error) {
+func ValidateToken(tokenString string) (int, string, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &jwt.MapClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return JWTSecret, nil
 	})
 	if err != nil {
-		return 0, err
+		return 0, "", err
 	}
 	claims, ok := token.Claims.(*jwt.MapClaims)
 	if !ok {
-		return 0, fmt.Errorf("invalid token claims")
+		return 0, "", fmt.Errorf("invalid token claims")
 	}
 	id := (*claims)["id"].(float64)
-	return int(id), nil
+	username := (*claims)["username"].(string)
+	return int(id), username, nil
 
 }

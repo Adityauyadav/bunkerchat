@@ -163,18 +163,16 @@ func chatHistoryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var chatMessages []ChatMessage
-	if messages != nil {
-		for _, msg := range messages {
-			sender := "You"
-			if msg.SentFromID != userID {
-				sender = recipient
-			}
-			chatMessages = append(chatMessages, ChatMessage{
-				From:      sender,
-				Content:   msg.Content,
-				CreatedAt: msg.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
-			})
+	for _, msg := range messages {
+		sender := "You"
+		if msg.SentFromID != userID {
+			sender = recipient
 		}
+		chatMessages = append(chatMessages, ChatMessage{
+			From:      sender,
+			Content:   msg.Content,
+			CreatedAt: msg.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		})
 	}
 
 	w.Header().Set("Content-Type", "application/json")

@@ -29,14 +29,12 @@ func wsConnect(token string, recipient string, username string) error {
 	if err != nil {
 		return fmt.Errorf("failed to connect to websocket: %w", err)
 	}
-	defer ws.Close()
 
 	fmt.Printf("\n--- Connected to %s ---\n", recipient)
 	fmt.Println("Type your message and press Enter to send. Press Ctrl+C to exit.")
 	fmt.Println()
 
 	done := make(chan struct{})
-	var wg sync.WaitGroup
 	var closeOnce sync.Once
 	closeDone := func() {
 		closeOnce.Do(func() {
@@ -44,34 +42,15 @@ func wsConnect(token string, recipient string, username string) error {
 		})
 	}
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		readFromServer(ws, done, recipient, closeDone)
-	}()
+	go readFromServer(ws, done, recipient, closeDone)
+	go sendFromTerminal(ws, done, recipient, closeDone)
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		sendFromTerminal(ws, done, recipient, closeDone)
-	}()
+	go handleSignals(done, closeDone)
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		handleSignals(done, closeDone)
-	}()
-
-	wg.Wait()
+	<-done
+	ws.Close()
 
 	fmt.Println("\n--- Chat ended ---")
-	shouldDownload := promptDownload()
-	if shouldDownload {
-		if err := downloadChat(username, recipient, token); err != nil {
-			fmt.Printf("Failed to download chat: %v\n", err)
-		}
-	}
-
 	fmt.Println("Session ended. Goodbye.")
 	return nil
 }

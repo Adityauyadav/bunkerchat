@@ -33,5 +33,4 @@ func registerRoutes(hub *Hub) {
 	http.HandleFunc("/register", registerHandler)
 	http.HandleFunc("/login", loginHandler)
 	http.HandleFunc("/ws", wsHandler(hub))
-	http.HandleFunc("/chat/", chatHistoryHandler)
 }
